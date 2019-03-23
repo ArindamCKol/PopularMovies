@@ -1,3 +1,16 @@
 <resources>
     <string name="app_name">Popular Movies</string>
+    <string name="sort_by">Sort by :</string>
+    <string name="no_network">No Network Connection Found</string>
+    <string name="no_data">No News article found</string>
+
+    <string name="show_title">Title : %s</string>
+    <string name="show_date">Release Date : %s</string>
+    <string name="show_vote">Average Vote : %s</string>
+    <string name="show_plot">Plot : %s</string>
+
+    <string-array name="spinner_array">
+        <item>Most Popular</item>
+        <item>Highest Rated</item>
+    </string-array>
 </resources>
