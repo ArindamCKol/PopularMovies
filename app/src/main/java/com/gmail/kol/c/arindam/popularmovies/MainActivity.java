@@ -34,9 +34,6 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     private static final String SORT_BY = "sort_by";
     public static final String INTENT_EXTRA_ID = "current_movie";
 
-    //themoviedb root url
-    private static final String THEMOVIEDB_QUERY_URL = "https://api.themoviedb.org/3/discover/movie?";
-
     //to count pages for url query
     private int currentPage = 1;
 
