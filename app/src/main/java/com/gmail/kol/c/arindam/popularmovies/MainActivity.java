@@ -41,8 +41,8 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     private int currentPage = 1;
 
     //strings for sort by query
-    private String[] sortQuery = {"popularity.desc", "vote_count.desc"};
-    private String queryString = sortQuery[0];
+    private String[] queryURL = {"https://api.themoviedb.org/3/movie/popular", "https://api.themoviedb.org/3/movie/top_rated"};
+    private String currentURL = queryURL[0];
 
     //declare spinner & swipe refresh layout
     private Spinner movieSpinner;
@@ -61,7 +61,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
         if(savedInstanceState != null) {
             currentPage = savedInstanceState.getInt(CURRENT_PAGE);
-            queryString = savedInstanceState.getString(SORT_BY);
+            currentURL = savedInstanceState.getString(SORT_BY);
         }
 
         //set up on refresh listener
@@ -116,7 +116,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         outState.putInt(CURRENT_PAGE, currentPage);
-        outState.putString(SORT_BY, queryString);
+        outState.putString(SORT_BY, currentURL);
         super.onSaveInstanceState(outState);
     }
 
@@ -124,10 +124,8 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     @Override
     public Loader<List<Movie>> onCreateLoader(int i, Bundle bundle) {
         //build query url from base uri as per current page & sort type
-        Uri baseUri = Uri.parse(THEMOVIEDB_QUERY_URL);
+        Uri baseUri = Uri.parse(currentURL);
         Uri.Builder uriBuilder = baseUri.buildUpon();
-        uriBuilder.appendQueryParameter("sort_by", queryString);
-        uriBuilder.appendQueryParameter("language","en-US");
         uriBuilder.appendQueryParameter("page",Integer.toString(currentPage));
         uriBuilder.appendQueryParameter("api_key", BuildConfig.API_KEY);
         return new MovieLoader(this,uriBuilder.toString());
@@ -173,7 +171,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     public void onItemSelected(AdapterView<?> adapterView, View view, int position, long id) {
         if(isUserInteracted) {
             loadingIndicator.setVisibility(View.VISIBLE);
-            queryString = sortQuery[position];
+            currentURL = queryURL[position];
             currentPage = 1;
             getLoaderManager().restartLoader(1, null, this).forceLoad();
         }
