@@ -3,7 +3,7 @@ package com.gmail.kol.c.arindam.popularmovies.Utils;
 import android.text.TextUtils;
 import android.util.Log;
 
-import com.gmail.kol.c.arindam.popularmovies.Model.Movie;
+import com.gmail.kol.c.arindam.popularmovies.database.Movie;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -86,5 +86,90 @@ public final class JSONUtils {
 
         // Return the list of Movies
         return movieList;
+    }
+
+    public static List<String> getReviewfromJson (String jsonString) {
+
+        //if the JSON string is empty or null, then return null.
+        if (TextUtils.isEmpty(jsonString)) {
+            return null;
+        }
+
+        List<String> movieReviews = new ArrayList<>();
+
+        //parsing json string
+        try {
+
+            //create a json Object from the json string
+            JSONObject baseJsonResponse = new JSONObject(jsonString);
+
+            //extract the json array with the key "results",
+            JSONArray reviewArray = baseJsonResponse.getJSONArray(RESULTS);
+
+            //get results array length
+            int count = reviewArray.length();
+
+            //from article array extract individual movie details
+            for (int i = 0; i < count; i++) {
+
+                JSONObject currentReview = reviewArray.getJSONObject(i);
+
+                //extract string value for key "author"
+                String reviewText = currentReview.optString("author");
+
+                //extract string value for key "content"
+                reviewText = reviewText + " : \n" + currentReview.optString("content");
+
+                movieReviews.add(reviewText);
+            }
+
+        } catch (JSONException e) {
+            // catch the exception here & print a log message
+            Log.e("JSONUtils", "Problem parsing json results", e);
+        }
+
+        // Return the list of Movies
+        return movieReviews;
+    }
+
+    public static List<String> getTrailerfromJson (String jsonString) {
+
+        //if the JSON string is empty or null, then return null.
+        if (TextUtils.isEmpty(jsonString)) {
+            return null;
+        }
+
+        List<String> youtubeKeys = new ArrayList<>();
+
+        //parsing json string
+        try {
+
+            //create a json Object from the json string
+            JSONObject baseJsonResponse = new JSONObject(jsonString);
+
+            //extract the json array with the key "results",
+            JSONArray trailerArray = baseJsonResponse.getJSONArray(RESULTS);
+
+            //get results array length
+            int count = trailerArray.length();
+
+            //from article array extract individual movie details
+            for (int i = 0; i < count; i++) {
+
+                JSONObject currentTrailer = trailerArray.getJSONObject(i);
+
+                //extract string value for key "key"
+                String tempKey = currentTrailer.optString("key");
+
+                youtubeKeys.add(tempKey);
+            }
+
+        } catch (JSONException e) {
+            // catch the exception here & print a log message
+            Log.e("JSONUtils", "Problem parsing json results", e);
+        }
+
+        // Return the list of Movies
+        return youtubeKeys;
     }
 }

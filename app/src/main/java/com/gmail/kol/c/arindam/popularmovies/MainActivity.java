@@ -17,12 +17,15 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
+import android.widget.Switch;
 import android.widget.TextView;
 
 
 import com.gmail.kol.c.arindam.popularmovies.Helper.MovieListAdapter;
 import com.gmail.kol.c.arindam.popularmovies.Helper.MovieLoader;
-import com.gmail.kol.c.arindam.popularmovies.Model.Movie;
+import com.gmail.kol.c.arindam.popularmovies.Utils.AppDatabase;
+import com.gmail.kol.c.arindam.popularmovies.Utils.AppExecutors;
+import com.gmail.kol.c.arindam.popularmovies.database.Movie;
 
 import java.util.List;
 
@@ -33,9 +36,6 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     private static final String CURRENT_PAGE = "current_page";
     private static final String SORT_BY = "sort_by";
     public static final String INTENT_EXTRA_ID = "current_movie";
-
-    //themoviedb root url
-    private static final String THEMOVIEDB_QUERY_URL = "https://api.themoviedb.org/3/discover/movie?";
 
     //to count pages for url query
     private int currentPage = 1;
@@ -54,10 +54,14 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     private TextView emptyView;
     private View loadingIndicator;
 
+    AppDatabase mDB;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        mDB = AppDatabase.getInstance(getApplicationContext());
 
         if(savedInstanceState != null) {
             currentPage = savedInstanceState.getInt(CURRENT_PAGE);
@@ -120,7 +124,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         super.onSaveInstanceState(outState);
     }
 
-    //get movie list from themoviedb i a background thread
+    //get movie list from themoviedb in a background thread
     @Override
     public Loader<List<Movie>> onCreateLoader(int i, Bundle bundle) {
         //build query url from base uri as per current page & sort type
@@ -169,11 +173,25 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     //spinner item selected reset loader
     @Override
     public void onItemSelected(AdapterView<?> adapterView, View view, int position, long id) {
-        if(isUserInteracted) {
+
+        if(isUserInteracted && position<=1) {
             loadingIndicator.setVisibility(View.VISIBLE);
             currentURL = queryURL[position];
             currentPage = 1;
             getLoaderManager().restartLoader(1, null, this).forceLoad();
+        } else if (isUserInteracted && position == 2) {
+            AppExecutors.getInstance().diskIO().execute(new Runnable() {
+                @Override
+                public void run() {
+                    final List<Movie> movieList = mDB.movieDao().LoadAllMovie();
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            movieListAdapter.setMovieList(movieList);
+                        }
+                    });
+                }
+            });
         }
     }
 
@@ -186,8 +204,10 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     @Override
     public void onRefresh() {
         swipeRefreshLayout.setRefreshing(false);
-        loadingIndicator.setVisibility(View.VISIBLE);
-        currentPage++;
-        getLoaderManager().restartLoader(1,null,this).forceLoad();
+        if(movieSpinner.getSelectedItemPosition()<2) {
+            loadingIndicator.setVisibility(View.VISIBLE);
+            currentPage++;
+            getLoaderManager().restartLoader(1, null, this).forceLoad();
+        }
     }
 }

@@ -5,7 +5,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.content.AsyncTaskLoader;
 
-import com.gmail.kol.c.arindam.popularmovies.Model.Movie;
+import com.gmail.kol.c.arindam.popularmovies.database.Movie;
 import com.gmail.kol.c.arindam.popularmovies.Utils.JSONUtils;
 import com.gmail.kol.c.arindam.popularmovies.Utils.NetworkUtils;
 

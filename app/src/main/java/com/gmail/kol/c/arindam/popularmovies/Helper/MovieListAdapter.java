@@ -9,7 +9,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.gmail.kol.c.arindam.popularmovies.Model.Movie;
+import com.gmail.kol.c.arindam.popularmovies.database.Movie;
 import com.gmail.kol.c.arindam.popularmovies.R;
 import com.squareup.picasso.Picasso;
 
