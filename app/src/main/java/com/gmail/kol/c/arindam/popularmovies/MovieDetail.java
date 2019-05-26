@@ -43,6 +43,7 @@ public class MovieDetail extends AppCompatActivity implements TrailerListAdapter
         //get movie object from mainactivity
         Intent intent = getIntent();
         final Movie currentMovie = intent.getParcelableExtra(MainActivity.INTENT_EXTRA_ID);
+//        boolean isFavourite = intent.getBooleanExtra(MainActivity.IS_FAVOURITE, false);
         setTitle(currentMovie.getMovieTitle());
 
         //declare & assign views
@@ -52,7 +53,7 @@ public class MovieDetail extends AppCompatActivity implements TrailerListAdapter
         TextView voteAverageTextView = findViewById(R.id.vote_average);
         TextView plotTextView = findViewById(R.id.plot);
         favouriteSwitch = findViewById(R.id.switch_favourite);
-
+        checkFavourite(currentMovie.getMovieID());
         //set data to views
         String backdropURL = "https://image.tmdb.org/t/p/w500" + currentMovie.getMovieBackdropPath();
         Picasso.get()
@@ -67,24 +68,44 @@ public class MovieDetail extends AppCompatActivity implements TrailerListAdapter
         showReviews(currentMovie.getMovieID());
         showTrailer(currentMovie.getMovieID());
 
-        favouriteSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+        favouriteSwitch.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
-                if(isChecked) {
+            public void onClick(View view) {
+                if(favouriteSwitch.isChecked()) {
                     AppExecutors.getInstance().diskIO().execute(new Runnable() {
                         @Override
                         public void run() {
                             mDB.movieDao().insertFavouriteMovie(currentMovie);
                         }
                     });
-
                 } else {
-
+                    AppExecutors.getInstance().diskIO().execute(new Runnable() {
+                        @Override
+                        public void run() {
+                            mDB.movieDao().deleteFavouriteMovie(currentMovie);
+                        }
+                    });
                 }
             }
         });
     }
 
+    private void checkFavourite (final int movieID) {
+        AppExecutors.getInstance().diskIO().execute(new Runnable() {
+            @Override
+            public void run() {
+                final Movie movie = mDB.movieDao().loadMovieByID(movieID);
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (movie != null) {
+                            favouriteSwitch.setChecked(true);
+                        }
+                    }
+                });
+            }
+        });
+    }
     private void showTrailer(final int movieID) {
         RecyclerView trailerList = findViewById(R.id.rv_trailer);
         trailerList.setLayoutManager(new LinearLayoutManager(this,LinearLayoutManager.HORIZONTAL,false));

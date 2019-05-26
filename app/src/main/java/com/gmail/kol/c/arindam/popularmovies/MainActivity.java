@@ -1,6 +1,9 @@
 package com.gmail.kol.c.arindam.popularmovies;
 
 import android.app.LoaderManager;
+import android.arch.lifecycle.Observer;
+import android.arch.lifecycle.ViewModelProvider;
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.Intent;
 import android.content.Loader;
@@ -8,6 +11,7 @@ import android.content.res.Configuration;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
+import android.support.annotation.Nullable;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -22,6 +26,7 @@ import android.widget.TextView;
 
 
 import com.gmail.kol.c.arindam.popularmovies.Helper.MovieListAdapter;
+import com.gmail.kol.c.arindam.popularmovies.Helper.MovieListViewModel;
 import com.gmail.kol.c.arindam.popularmovies.Helper.MovieLoader;
 import com.gmail.kol.c.arindam.popularmovies.Utils.AppDatabase;
 import com.gmail.kol.c.arindam.popularmovies.Utils.AppExecutors;
@@ -35,7 +40,9 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
     private static final String CURRENT_PAGE = "current_page";
     private static final String SORT_BY = "sort_by";
+    private static final String SPINNER_POSITION = "spinner_position";
     public static final String INTENT_EXTRA_ID = "current_movie";
+    public static final String IS_FAVOURITE = "is_selected_movie_favourite";
 
     //to count pages for url query
     private int currentPage = 1;
@@ -46,6 +53,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
     //declare spinner & swipe refresh layout
     private Spinner movieSpinner;
+    private int spinnerPosition;
     private SwipeRefreshLayout swipeRefreshLayout;
     private  boolean isUserInteracted = false;
 
@@ -66,6 +74,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         if(savedInstanceState != null) {
             currentPage = savedInstanceState.getInt(CURRENT_PAGE);
             currentURL = savedInstanceState.getString(SORT_BY);
+            spinnerPosition = savedInstanceState.getInt(SPINNER_POSITION);
         }
 
         //set up on refresh listener
@@ -95,25 +104,34 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         movieListAdapter = new MovieListAdapter(this);
         movieListView.setAdapter(movieListAdapter);
 
-        //get a reference to the ConnectivityManager to check state of network connectivity
-        ConnectivityManager connMgr = (ConnectivityManager)
-                getSystemService(Context.CONNECTIVITY_SERVICE);
 
-        //get details on the currently active default data network
-        NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
+        if(spinnerPosition<2) {
+            //get a reference to the ConnectivityManager to check state of network connectivity
+            ConnectivityManager connMgr = (ConnectivityManager)
+                    getSystemService(Context.CONNECTIVITY_SERVICE);
 
-        //if there is a network connection, fetch data
-        if (networkInfo != null && networkInfo.isConnected()) {
+            //get details on the currently active default data network
+            NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
 
-            //initialize the loader
-            getLoaderManager().initLoader(1,null,this).forceLoad();
-        } else {
-            //hide loading indicator
-            loadingIndicator.setVisibility(View.GONE);
+            //if there is a network connection, fetch data
+            if (networkInfo != null && networkInfo.isConnected()) {
 
-            //show empty text message
-            emptyView.setText(R.string.no_network);
-        }
+                //initialize the loader
+                getLoaderManager().initLoader(1, null, this).forceLoad();
+            } else {
+                //hide loading indicator
+                loadingIndicator.setVisibility(View.GONE);
+
+                //show empty text message
+                emptyView.setText(R.string.no_network);
+            }
+        } else {showFavouriteMovieList();}
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
     }
 
     //save current page & query string during state change
@@ -121,6 +139,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     protected void onSaveInstanceState(Bundle outState) {
         outState.putInt(CURRENT_PAGE, currentPage);
         outState.putString(SORT_BY, currentURL);
+        outState.putInt(SPINNER_POSITION, movieSpinner.getSelectedItemPosition());
         super.onSaveInstanceState(outState);
     }
 
@@ -180,24 +199,24 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             currentPage = 1;
             getLoaderManager().restartLoader(1, null, this).forceLoad();
         } else if (isUserInteracted && position == 2) {
-            AppExecutors.getInstance().diskIO().execute(new Runnable() {
-                @Override
-                public void run() {
-                    final List<Movie> movieList = mDB.movieDao().LoadAllMovie();
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            movieListAdapter.setMovieList(movieList);
-                        }
-                    });
-                }
-            });
+           showFavouriteMovieList();
         }
     }
 
     @Override
     public void onNothingSelected(AdapterView<?> adapterView) {
 
+    }
+
+    private void showFavouriteMovieList() {
+        loadingIndicator.setVisibility(View.GONE);
+        MovieListViewModel viewModel = ViewModelProviders.of(this).get(MovieListViewModel.class);
+        viewModel.getFavouriteMovies().observe(this, new Observer<List<Movie>>() {
+            @Override
+            public void onChanged(@Nullable List<Movie> movies) {
+                movieListAdapter.setMovieList(movies);
+            }
+        });
     }
 
     //on down drag increase page no. and reset loader

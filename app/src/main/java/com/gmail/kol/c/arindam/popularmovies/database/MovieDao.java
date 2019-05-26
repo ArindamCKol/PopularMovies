@@ -11,7 +11,7 @@ import java.util.List;
 @Dao
 public interface MovieDao {
     @Query("SELECT * FROM favourite_movie ORDER BY movieID")
-    List<Movie> LoadAllMovie();
+    LiveData<List<Movie>> LoadAllMovie();
 
     @Query("SELECT * FROM favourite_movie WHERE movieID = :movieID")
     Movie loadMovieByID (int movieID);
