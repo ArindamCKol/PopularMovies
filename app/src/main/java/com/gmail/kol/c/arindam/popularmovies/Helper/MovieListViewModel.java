@@ -10,6 +10,7 @@ import com.gmail.kol.c.arindam.popularmovies.database.Movie;
 
 import java.util.List;
 
+//View model class for favourite movie list
 public class MovieListViewModel extends AndroidViewModel {
 
     private LiveData<List<Movie>> favouriteMovies;
@@ -17,7 +18,7 @@ public class MovieListViewModel extends AndroidViewModel {
     public MovieListViewModel(@NonNull Application application) {
         super(application);
         AppDatabase database = AppDatabase.getInstance(this.getApplication());
-        favouriteMovies = database.movieDao().LoadAllMovie();
+        favouriteMovies = database.movieDao().LoadAllMovie(); // get list of all movies from db
     }
 
     public LiveData<List<Movie>> getFavouriteMovies() {

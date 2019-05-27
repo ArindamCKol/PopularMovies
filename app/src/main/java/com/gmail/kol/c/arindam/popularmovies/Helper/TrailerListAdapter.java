@@ -7,7 +7,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.TextView;
 
 import com.gmail.kol.c.arindam.popularmovies.R;
 import com.squareup.picasso.Picasso;
@@ -15,14 +14,17 @@ import com.squareup.picasso.Picasso;
 import java.util.ArrayList;
 import java.util.List;
 
+//recycler view adapter for movie trailer list
 public class TrailerListAdapter extends RecyclerView.Adapter <TrailerListAdapter.TrailerHolder> {
     private List<String> youtubeKeyList = new ArrayList<>();
     private TrailerClickListener listener;
 
+    //constructor with item click listener
     public TrailerListAdapter(TrailerClickListener listener) {
         this.listener = listener;
     }
 
+    //view holder for list item, also implements click listener for item
     public class TrailerHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
         public ImageView traierThumbnail;
         public TrailerHolder(@NonNull View itemView) {
@@ -47,12 +49,14 @@ public class TrailerListAdapter extends RecyclerView.Adapter <TrailerListAdapter
         return new TrailerHolder(view);
     }
 
+    //bind data to view holder items
     @Override
     public void onBindViewHolder(@NonNull TrailerHolder trailerHolder, int position) {
         String thumbnailURL = "https://img.youtube.com/vi/" +youtubeKeyList.get(position)+ "/hqdefault.jpg";
         Picasso.get().load(thumbnailURL).into(trailerHolder.traierThumbnail);
     }
 
+    //item click listener interface with onclick method
     public interface TrailerClickListener {
         void onClick (String youtubeKey);
     }

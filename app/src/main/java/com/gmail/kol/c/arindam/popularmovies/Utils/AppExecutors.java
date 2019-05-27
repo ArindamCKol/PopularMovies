@@ -23,12 +23,7 @@ import android.support.annotation.NonNull;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
-/**
- * Global executor pools for the whole application.
- * <p>
- * Grouping tasks like this avoids the effects of task starvation (e.g. disk reads don't wait behind
- * webservice requests).
- */
+//executor pool for disk & network io
 public class AppExecutors {
 
     // For Singleton instantiation

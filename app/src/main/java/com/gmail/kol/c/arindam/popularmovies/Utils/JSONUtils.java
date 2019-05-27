@@ -88,6 +88,7 @@ public final class JSONUtils {
         return movieList;
     }
 
+    //create list of review string from json string
     public static List<String> getReviewfromJson (String jsonString) {
 
         //if the JSON string is empty or null, then return null.
@@ -109,7 +110,7 @@ public final class JSONUtils {
             //get results array length
             int count = reviewArray.length();
 
-            //from article array extract individual movie details
+            //from result array extract individual movie review
             for (int i = 0; i < count; i++) {
 
                 JSONObject currentReview = reviewArray.getJSONObject(i);
@@ -117,7 +118,7 @@ public final class JSONUtils {
                 //extract string value for key "author"
                 String reviewText = currentReview.optString("author");
 
-                //extract string value for key "content"
+                //extract string value for key "content" & to string
                 reviewText = reviewText + " : \n" + currentReview.optString("content");
 
                 movieReviews.add(reviewText);
@@ -128,10 +129,11 @@ public final class JSONUtils {
             Log.e("JSONUtils", "Problem parsing json results", e);
         }
 
-        // Return the list of Movies
+        // Return the list of Movie reviews
         return movieReviews;
     }
 
+    //create list of youtube trailer id string from json string
     public static List<String> getTrailerfromJson (String jsonString) {
 
         //if the JSON string is empty or null, then return null.
@@ -153,7 +155,7 @@ public final class JSONUtils {
             //get results array length
             int count = trailerArray.length();
 
-            //from article array extract individual movie details
+            //from result array extract youtube trailer id
             for (int i = 0; i < count; i++) {
 
                 JSONObject currentTrailer = trailerArray.getJSONObject(i);
@@ -169,7 +171,7 @@ public final class JSONUtils {
             Log.e("JSONUtils", "Problem parsing json results", e);
         }
 
-        // Return the list of Movies
+        // Return the list of youtube trailer id
         return youtubeKeys;
     }
 }

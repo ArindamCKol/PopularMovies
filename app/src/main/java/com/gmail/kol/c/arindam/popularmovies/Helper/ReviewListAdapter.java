@@ -13,10 +13,12 @@ import com.gmail.kol.c.arindam.popularmovies.R;
 import java.util.ArrayList;
 import java.util.List;
 
+//recycler view adapter for movie review list
 public class ReviewListAdapter extends RecyclerView.Adapter <ReviewListAdapter.ReviewHolder> {
 
     List<String> movieReviewList = new ArrayList<>();
 
+    //view holder for list item
     public class ReviewHolder extends RecyclerView.ViewHolder {
         public TextView reviewText;
         public ReviewHolder(@NonNull View itemView) {
@@ -33,10 +35,11 @@ public class ReviewListAdapter extends RecyclerView.Adapter <ReviewListAdapter.R
         return new ReviewHolder(view);
     }
 
-
+    //bind data to view holder items
     @Override
     public void onBindViewHolder(@NonNull final ReviewListAdapter.ReviewHolder viewHolder, final int position) {
         viewHolder.reviewText.setText(movieReviewList.get(position));
+        //if review item clicked show full review
         viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

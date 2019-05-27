@@ -2,7 +2,6 @@ package com.gmail.kol.c.arindam.popularmovies;
 
 import android.app.LoaderManager;
 import android.arch.lifecycle.Observer;
-import android.arch.lifecycle.ViewModelProvider;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.Intent;
@@ -21,7 +20,6 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
-import android.widget.Switch;
 import android.widget.TextView;
 
 
@@ -29,7 +27,6 @@ import com.gmail.kol.c.arindam.popularmovies.Helper.MovieListAdapter;
 import com.gmail.kol.c.arindam.popularmovies.Helper.MovieListViewModel;
 import com.gmail.kol.c.arindam.popularmovies.Helper.MovieLoader;
 import com.gmail.kol.c.arindam.popularmovies.Utils.AppDatabase;
-import com.gmail.kol.c.arindam.popularmovies.Utils.AppExecutors;
 import com.gmail.kol.c.arindam.popularmovies.database.Movie;
 
 import java.util.List;
@@ -42,7 +39,6 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     private static final String SORT_BY = "sort_by";
     private static final String SPINNER_POSITION = "spinner_position";
     public static final String INTENT_EXTRA_ID = "current_movie";
-    public static final String IS_FAVOURITE = "is_selected_movie_favourite";
 
     //to count pages for url query
     private int currentPage = 1;
@@ -62,6 +58,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     private TextView emptyView;
     private View loadingIndicator;
 
+    //declare database variable
     AppDatabase mDB;
 
     @Override
@@ -69,6 +66,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        //create db
         mDB = AppDatabase.getInstance(getApplicationContext());
 
         if(savedInstanceState != null) {
@@ -104,7 +102,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         movieListAdapter = new MovieListAdapter(this);
         movieListView.setAdapter(movieListAdapter);
 
-
+        //if favourite movie (2) selected use view model otherwise (0,1) use loader
         if(spinnerPosition<2) {
             //get a reference to the ConnectivityManager to check state of network connectivity
             ConnectivityManager connMgr = (ConnectivityManager)
@@ -131,7 +129,6 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     @Override
     protected void onResume() {
         super.onResume();
-
     }
 
     //save current page & query string during state change
@@ -208,6 +205,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
     }
 
+    //Show favourite movie list using view model
     private void showFavouriteMovieList() {
         loadingIndicator.setVisibility(View.GONE);
         MovieListViewModel viewModel = ViewModelProviders.of(this).get(MovieListViewModel.class);

@@ -9,6 +9,7 @@ import android.util.Log;
 import com.gmail.kol.c.arindam.popularmovies.database.Movie;
 import com.gmail.kol.c.arindam.popularmovies.database.MovieDao;
 
+//create db
 @Database(entities = {Movie.class}, version = 1, exportSchema = false)
 public abstract class AppDatabase extends RoomDatabase {
 

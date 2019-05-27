@@ -28,8 +28,9 @@ import java.util.List;
 
 public class MovieDetail extends AppCompatActivity implements TrailerListAdapter.TrailerClickListener{
 
+    private static final String TMDB_BACKDROP_URL = "https://image.tmdb.org/t/p/w500";
     String youTubeVideoURL = "https://www.youtube.com/watch?v=";
-    String youTubeThumbnailURL = "http://img.youtube.com/vi/\"+videoId+/mqdefault.jpg";
+    //declare switch button
     Switch favouriteSwitch;
     AppDatabase mDB;
 
@@ -43,7 +44,6 @@ public class MovieDetail extends AppCompatActivity implements TrailerListAdapter
         //get movie object from mainactivity
         Intent intent = getIntent();
         final Movie currentMovie = intent.getParcelableExtra(MainActivity.INTENT_EXTRA_ID);
-//        boolean isFavourite = intent.getBooleanExtra(MainActivity.IS_FAVOURITE, false);
         setTitle(currentMovie.getMovieTitle());
 
         //declare & assign views
@@ -53,9 +53,9 @@ public class MovieDetail extends AppCompatActivity implements TrailerListAdapter
         TextView voteAverageTextView = findViewById(R.id.vote_average);
         TextView plotTextView = findViewById(R.id.plot);
         favouriteSwitch = findViewById(R.id.switch_favourite);
-        checkFavourite(currentMovie.getMovieID());
+        checkFavourite(currentMovie.getMovieID()); //check is it favourite movie then set switch as checked
         //set data to views
-        String backdropURL = "https://image.tmdb.org/t/p/w500" + currentMovie.getMovieBackdropPath();
+        String backdropURL = TMDB_BACKDROP_URL + currentMovie.getMovieBackdropPath();
         Picasso.get()
                .load(backdropURL)
                .placeholder(R.drawable.no_image)
@@ -68,6 +68,7 @@ public class MovieDetail extends AppCompatActivity implements TrailerListAdapter
         showReviews(currentMovie.getMovieID());
         showTrailer(currentMovie.getMovieID());
 
+        //if switch button clicked insert / delete movie item / row
         favouriteSwitch.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -90,6 +91,7 @@ public class MovieDetail extends AppCompatActivity implements TrailerListAdapter
         });
     }
 
+    //check is it favourite movie then set switch as checked
     private void checkFavourite (final int movieID) {
         AppExecutors.getInstance().diskIO().execute(new Runnable() {
             @Override
@@ -106,6 +108,8 @@ public class MovieDetail extends AppCompatActivity implements TrailerListAdapter
             }
         });
     }
+
+    //setup trailer recycler view
     private void showTrailer(final int movieID) {
         RecyclerView trailerList = findViewById(R.id.rv_trailer);
         trailerList.setLayoutManager(new LinearLayoutManager(this,LinearLayoutManager.HORIZONTAL,false));
@@ -143,6 +147,7 @@ public class MovieDetail extends AppCompatActivity implements TrailerListAdapter
         return false;
     }
 
+    //setup review recycler view
     public void showReviews(final int movieID) {
         RecyclerView reviewList = findViewById(R.id.rv_reviews);
         reviewList.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
@@ -173,6 +178,7 @@ public class MovieDetail extends AppCompatActivity implements TrailerListAdapter
         });
     }
 
+    //show trailer in youtube intent if review thumbnail clicked
     @Override
     public void onClick(String youtubeKey) {
         String youtubeURI = youTubeVideoURL + youtubeKey;

@@ -5,11 +5,11 @@ import android.arch.persistence.room.PrimaryKey;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-//movie class
-@Entity (tableName = "favourite_movie")
+//movie class with room database implementation
+@Entity (tableName = "favourite_movie") //table name
 public class Movie implements Parcelable {
     @PrimaryKey
-    private int movieID;
+    private int movieID; //primary key
     private String moviePosterPath;
     private String movieTitle;
     private String movieReleaseDate;
